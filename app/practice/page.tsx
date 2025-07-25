@@ -17,8 +17,10 @@ export default function PracticeArenaPage() {
 
   return (
     <main className="container mx-auto px-4 py-8 space-y-8">
-      <h1 className="text-3xl font-bold">Practice Arena</h1>
-      <p className="text-lg text-muted-foreground">Simulate debates with AI opponents and get instant feedback.</p>
+      <h1 className="text-3xl font-bold animate-fadeIn">Practice Arena</h1>
+      <p className="text-lg text-muted-foreground animate-fadeIn animation-delay-100">
+        Simulate debates with AI opponents and get instant feedback.
+      </p>
 
       {!debateStarted ? (
         <RoleSelector onRoleSelect={handleRoleSelect} />

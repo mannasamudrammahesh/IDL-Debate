@@ -10,7 +10,7 @@ export function ProgressOverview() {
 
   if (loading) {
     return (
-      <Card className="w-full">
+      <Card className="w-full animate-fadeIn">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Loader2 className="animate-spin h-5 w-5" /> Loading Progress...
@@ -30,7 +30,7 @@ export function ProgressOverview() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full animate-fadeIn">
       <CardHeader>
         <CardTitle>Your Progress</CardTitle>
       </CardHeader>

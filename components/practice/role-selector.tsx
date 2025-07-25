@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 interface RoleSelectorProps {
   onRoleSelect: (role: string, motion: string) => void
@@ -13,6 +14,7 @@ interface RoleSelectorProps {
 export function RoleSelector({ onRoleSelect }: RoleSelectorProps) {
   const [selectedRole, setSelectedRole] = useState("")
   const [debateMotion, setDebateMotion] = useState("")
+  const [customMotion, setCustomMotion] = useState("")
 
   const motions = [
     "Should school uniforms be mandatory?",
@@ -29,15 +31,16 @@ export function RoleSelector({ onRoleSelect }: RoleSelectorProps) {
   ]
 
   const handleSubmit = () => {
-    if (selectedRole && debateMotion) {
-      onRoleSelect(selectedRole, debateMotion)
+    const finalMotion = debateMotion === "custom" ? customMotion.trim() : debateMotion
+    if (selectedRole && finalMotion) {
+      onRoleSelect(selectedRole, finalMotion)
     } else {
       alert("Please select a role and a debate motion.")
     }
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card className="w-full max-w-lg mx-auto animate-fadeIn">
       <CardHeader>
         <CardTitle className="text-2xl text-center">Choose Your Debate</CardTitle>
         <CardDescription className="text-center">
@@ -80,7 +83,24 @@ export function RoleSelector({ onRoleSelect }: RoleSelectorProps) {
                 </Label>
               </div>
             ))}
+            <div
+              className="flex items-center space-x-2 border p-3 rounded-md hover:bg-muted cursor-pointer"
+              onClick={() => setDebateMotion("custom")}
+            >
+              <RadioGroupItem value="custom" id="custom-motion" />
+              <Label htmlFor="custom-motion" className="cursor-pointer">
+                Custom Motion
+              </Label>
+            </div>
           </RadioGroup>
+          {debateMotion === "custom" && (
+            <Input
+              placeholder="Enter your custom debate motion"
+              value={customMotion}
+              onChange={(e) => setCustomMotion(e.target.value)}
+              className="mt-2"
+            />
+          )}
         </div>
 
         <Button onClick={handleSubmit} className="w-full">

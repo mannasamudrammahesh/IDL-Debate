@@ -4,14 +4,20 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Play } from "lucide-react"
 import type { Lesson } from "@/lib/types"
+import { cn } from "@/utils/cn"
 
 interface LessonCardProps {
   lesson: Lesson
+  isLocked?: boolean
 }
 
-export function LessonCard({ lesson }: LessonCardProps) {
+export function LessonCard({ lesson, isLocked = false }: LessonCardProps) {
   return (
-    <Card className="flex flex-col justify-between h-full">
+    <Card
+      className={cn("flex flex-col justify-between h-full animate-slideInFromBottom", {
+        "opacity-60 cursor-not-allowed": isLocked,
+      })}
+    >
       <CardHeader>
         <CardTitle className="text-xl">{lesson.title}</CardTitle>
         <p className="text-sm text-muted-foreground">Level {lesson.level}</p>
@@ -32,13 +38,13 @@ export function LessonCard({ lesson }: LessonCardProps) {
             <CheckCircle className="h-4 w-4 mr-1" /> Completed
           </div>
         ) : (
-          <Button asChild size="sm">
+          <Button asChild size="sm" disabled={isLocked}>
             <Link href={`/learn/${lesson.id}`}>
-              <Play className="h-4 w-4 mr-2" /> Start
+              <Play className="h-4 w-4 mr-2" /> {lesson.progress > 0 ? "Resume" : "Start"}
             </Link>
           </Button>
         )}
-        {/* Placeholder for quiz challenge indicator if needed */}
+        {isLocked && <span className="text-sm text-red-500">Locked</span>}
       </CardFooter>
     </Card>
   )

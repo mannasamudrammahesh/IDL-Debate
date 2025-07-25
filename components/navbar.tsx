@@ -13,10 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, Settings, User } from "lucide-react"
+import { LogOut, Settings, User, BookOpen, Swords, Trophy } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
 
 export function Navbar() {
-  const { userProgress, loading } = useUserProgress()
+  const { userProgress, loading: progressLoading } = useUserProgress()
+  const { isAuthenticated, logout, loading: authLoading } = useAuth()
+
+  const loading = progressLoading || authLoading
 
   return (
     <nav className="flex items-center justify-between p-4 border-b bg-background">
@@ -26,7 +30,7 @@ export function Navbar() {
       <div className="flex items-center gap-4">
         {loading ? (
           <div className="h-8 w-24 bg-gray-200 rounded animate-pulse" />
-        ) : userProgress ? (
+        ) : isAuthenticated && userProgress ? (
           <>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium hidden sm:block">Level {userProgress.level}</span>
@@ -59,13 +63,31 @@ export function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link href="/learn">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    <span>Learn Modules</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/practice">
+                    <Swords className="mr-2 h-4 w-4" />
+                    <span>Practice Arena</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/achievements">
+                    <Trophy className="mr-2 h-4 w-4" />
+                    <span>Achievements</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/settings">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

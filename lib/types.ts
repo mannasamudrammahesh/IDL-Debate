@@ -1,20 +1,22 @@
 export type UserLevel = "middle-school" | "high-school"
-export type DebateExperience = "beginner" | "intermediate"
+export type DebateExperience = "beginner" | "intermediate" | "advanced"
 
 export interface UserProgress {
-  avatar: string
+  id: string
   nickname: string
+  avatar: string
+  gradeLevel: UserLevel | ""
+  experienceLevel: DebateExperience | ""
   xp: number
   level: number
   badges: string[]
   modulesCompleted: number
   debatesSimulated: number
   fallaciesDetected: number
-  gradeLevel: UserLevel
-  experienceLevel: DebateExperience
-  accuracy: number
-  responseTime: number
-  debateScore: number
+  lastLessonId?: string
+  lastLessonProgress?: number
+  weeklyStreak: number
+  lastLoginDate: string // YYYY-MM-DD
 }
 
 export interface Lesson {
@@ -22,22 +24,25 @@ export interface Lesson {
   title: string
   description: string
   level: number
-  progress: number // 0-100
+  xpReward: number
   completed: boolean
-  quiz: Quiz
-  content: string // Markdown or plain text
+  progress: number // 0-100
+  content: string
   diagramUrl?: string
+  quiz: Quiz
 }
 
 export interface Quiz {
   id: string
-  questions: Question[]
+  questions: QuizQuestion[]
 }
 
-export interface Question {
+export type QuizQuestionType = "mcq" | "true-false"
+
+export interface QuizQuestion {
   id: string
-  type: "mcq" | "true-false"
   question: string
+  type: QuizQuestionType
   options?: string[]
   correctAnswer: string
   feedback: string
@@ -51,13 +56,36 @@ export interface DebateMessage {
 }
 
 export interface AiFeedback {
+  argumentStrength: number // 0-10
+  coherenceScore: number // 0-10
   fallaciesDetected: string[]
   suggestions: string[]
-  coherenceScore: number // 0-10
+  rhetoricalTone: "formal" | "neutral" | "persuasive" | "aggressive"
+}
+
+export interface DebateSession {
+  id: string
+  motion: string
+  userRole: string
+  date: string // YYYY-MM-DD
+  duration: number // seconds
+  messages: DebateMessage[]
+  finalFeedback: AiFeedback
+  score: number // overall debate score
 }
 
 export interface Testimonial {
   quote: string
   author: string
   role: string
+}
+
+export interface Challenge {
+  id: string
+  name: string
+  description: string
+  xpReward: number
+  badgeReward?: string
+  completed: boolean
+  type: "daily" | "weekly"
 }

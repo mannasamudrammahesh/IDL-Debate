@@ -1,79 +1,97 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Camera, Loader2 } from "lucide-react"
 import { useUserProgress } from "@/hooks/use-user-progress"
 import type { UserLevel, DebateExperience } from "@/lib/types"
-import { Loader2 } from "lucide-react"
 
 export function ProfileSettings() {
   const { userProgress, loading, updateProgress, resetProgress } = useUserProgress()
   const [nickname, setNickname] = useState(userProgress?.nickname || "")
-  const [avatarUrl, setAvatarUrl] = useState(userProgress?.avatar || "")
-  const [gradeLevel, setGradeLevel] = useState<UserLevel>(userProgress?.gradeLevel || "high-school")
-  const [experienceLevel, setExperienceLevel] = useState<DebateExperience>(
-    userProgress?.experienceLevel || "intermediate",
-  )
+  const [avatar, setAvatar] = useState(userProgress?.avatar || "/placeholder.svg?height=128&width=128")
+  const [gradeLevel, setGradeLevel] = useState<UserLevel | "">(userProgress?.gradeLevel || "")
+  const [experienceLevel, setExperienceLevel] = useState<DebateExperience | "">(userProgress?.experienceLevel || "")
   const [isSaving, setIsSaving] = useState(false)
+  const [saveMessage, setSaveMessage] = useState<string | null>(null)
 
-  // Update local state when userProgress changes (e.g., after initial load)
-  useState(() => {
+  React.useEffect(() => {
     if (userProgress) {
       setNickname(userProgress.nickname)
-      setAvatarUrl(userProgress.avatar)
+      setAvatar(userProgress.avatar)
       setGradeLevel(userProgress.gradeLevel)
       setExperienceLevel(userProgress.experienceLevel)
     }
   }, [userProgress])
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setAvatar(event.target.result as string)
+        }
+      }
+      reader.readAsDataURL(e.target.files[0])
+    }
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate API call
+    setSaveMessage(null)
+
+    if (!nickname || !gradeLevel || !experienceLevel) {
+      setSaveMessage("Please fill in all required fields.")
+      setIsSaving(false)
+      return
+    }
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
     updateProgress({
       nickname,
-      avatar: avatarUrl,
-      gradeLevel,
-      experienceLevel,
+      avatar,
+      gradeLevel: gradeLevel as UserLevel,
+      experienceLevel: experienceLevel as DebateExperience,
     })
+
     setIsSaving(false)
-    alert("Profile updated successfully!")
+    setSaveMessage("Profile updated successfully!")
+    setTimeout(() => setSaveMessage(null), 3000)
   }
 
   const handleResetProgress = async () => {
-    if (confirm("Are you sure you want to reset all your progress? This cannot be undone.")) {
-      setIsSaving(true) // Use isSaving for this too
-      await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate reset
+    if (window.confirm("Are you sure you want to reset all your progress? This action cannot be undone.")) {
+      setIsSaving(true) // Use saving state for reset too
+      await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate reset time
       resetProgress()
       setIsSaving(false)
-      alert("Your progress has been reset.")
-      // Optionally redirect or refresh to show reset state
-      window.location.reload()
+      setSaveMessage("Progress reset successfully!")
+      setTimeout(() => setSaveMessage(null), 3000)
     }
   }
 
   if (loading) {
     return (
-      <Card className="w-full">
+      <Card className="w-full animate-fadeIn">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Loader2 className="animate-spin h-5 w-5" /> Loading Settings...
+            <Loader2 className="animate-spin h-5 w-5" /> Loading Profile Settings...
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="h-24 w-24 rounded-full bg-gray-200 animate-pulse" />
-            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-          </div>
+        <CardContent className="space-y-4">
+          <div className="h-20 w-20 rounded-full bg-gray-200 mx-auto animate-pulse" />
           <div className="h-10 w-full bg-gray-200 rounded animate-pulse" />
-          <div className="h-10 w-full bg-gray-200 rounded animate-pulse" />
+          <div className="h-24 w-full bg-gray-200 rounded animate-pulse" />
           <div className="h-24 w-full bg-gray-200 rounded animate-pulse" />
           <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
         </CardContent>
@@ -86,37 +104,52 @@ export function ProfileSettings() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full animate-fadeIn">
       <CardHeader>
         <CardTitle>Profile Settings</CardTitle>
-        <CardDescription>Manage your personal information and preferences.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSave} className="space-y-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={nickname} />
-              <AvatarFallback>{nickname.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="grid gap-1">
-              <Label htmlFor="avatar-url">Avatar URL</Label>
-              <Input
-                id="avatar-url"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="/placeholder.svg?height=100&width=100"
+      <CardContent className="grid gap-6">
+        <form onSubmit={handleSave} className="grid gap-6">
+          <div className="grid gap-2 text-center">
+            <Label htmlFor="avatar-upload" className="text-base cursor-pointer">
+              Change Avatar
+            </Label>
+            <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden group">
+              <Avatar className="w-full h-full">
+                <AvatarImage src={avatar || "/placeholder.svg"} alt="User Avatar" />
+                <AvatarFallback className="text-4xl">{nickname.charAt(0) || "?"}</AvatarFallback>
+              </Avatar>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleAvatarChange}
                 disabled={isSaving}
               />
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <Camera className="w-8 h-8 text-white" />
+              </div>
             </div>
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="nickname">Nickname</Label>
-            <Input id="nickname" value={nickname} onChange={(e) => setNickname(e.target.value)} disabled={isSaving} />
+            <Input
+              id="nickname"
+              type="text"
+              placeholder="DebateChamp"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              required
+              disabled={isSaving}
+            />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="grade-level">Grade Level</Label>
+            <Label htmlFor="grade-level" className="text-base">
+              Grade Level
+            </Label>
             <RadioGroup
               value={gradeLevel}
               onValueChange={(value: UserLevel) => setGradeLevel(value)}
@@ -124,18 +157,20 @@ export function ProfileSettings() {
               disabled={isSaving}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="middle-school" id="grade-middle" />
-                <Label htmlFor="grade-middle">Middle School</Label>
+                <RadioGroupItem value="middle-school" id="middle-school-settings" />
+                <Label htmlFor="middle-school-settings">Middle School</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="high-school" id="grade-high" />
-                <Label htmlFor="grade-high">High School</Label>
+                <RadioGroupItem value="high-school" id="high-school-settings" />
+                <Label htmlFor="high-school-settings">High School</Label>
               </div>
             </RadioGroup>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="experience-level">Debate Experience Level</Label>
+            <Label htmlFor="experience-level" className="text-base">
+              Debate Experience Level
+            </Label>
             <RadioGroup
               value={experienceLevel}
               onValueChange={(value: DebateExperience) => setExperienceLevel(value)}
@@ -143,37 +178,40 @@ export function ProfileSettings() {
               disabled={isSaving}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="beginner" id="exp-beginner" />
-                <Label htmlFor="exp-beginner">Beginner</Label>
+                <RadioGroupItem value="beginner" id="beginner-settings" />
+                <Label htmlFor="beginner-settings">Beginner</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="intermediate" id="exp-intermediate" />
-                <Label htmlFor="exp-intermediate">Intermediate</Label>
+                <RadioGroupItem value="intermediate" id="intermediate-settings" />
+                <Label htmlFor="intermediate-settings">Intermediate</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="advanced" id="advanced-settings" />
+                <Label htmlFor="advanced-settings">Advanced</Label>
               </div>
             </RadioGroup>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
+          {saveMessage && (
+            <p
+              className={`text-sm text-center ${saveMessage.includes("successfully") ? "text-green-600" : "text-red-600"}`}
+            >
+              {saveMessage}
+            </p>
+          )}
+
+          <Button type="submit" className="w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-destructive/20 space-y-4">
+        <div className="border-t pt-6 mt-6 space-y-4">
           <h3 className="text-lg font-semibold text-destructive">Danger Zone</h3>
-          <p className="text-sm text-muted-foreground">
-            Resetting your progress will delete all your earned XP, levels, and badges. This action cannot be undone.
-          </p>
           <Button variant="destructive" onClick={handleResetProgress} disabled={isSaving}>
             Reset All Progress
           </Button>
-        </div>
-
-        <div className="mt-8 pt-6 border-t space-y-4">
-          <h3 className="text-lg font-semibold">Account Actions</h3>
-          <Button variant="outline" onClick={() => alert("Logging out... (Simulated)")} disabled={isSaving}>
-            Logout
+          <Button variant="outline" className="w-full bg-transparent" disabled={isSaving}>
+            Delete Account (Mock)
           </Button>
         </div>
       </CardContent>

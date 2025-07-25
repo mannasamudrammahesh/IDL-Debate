@@ -5,14 +5,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { useUserProgress } from "@/hooks/use-user-progress"
-import { Loader2 } from "lucide-react"
+import { Loader2, Flame } from "lucide-react"
+import { cn } from "@/utils/cn"
 
 export function UserProfile() {
   const { userProgress, loading } = useUserProgress()
 
   if (loading) {
     return (
-      <Card className="w-full">
+      <Card className="w-full animate-fadeIn">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Loader2 className="animate-spin h-5 w-5" /> Loading Profile...
@@ -42,19 +43,21 @@ export function UserProfile() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full animate-fadeIn">
       <CardHeader>
-        <CardTitle>Your Profile</CardTitle>
+        <CardTitle>Welcome, {userProgress.nickname}!</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-4">
           <Avatar className="h-20 w-20">
             <AvatarImage src={userProgress.avatar || "/placeholder.svg"} alt={userProgress.nickname} />
-            <AvatarFallback>{userProgress.nickname.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="text-3xl">{userProgress.nickname.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-2xl font-bold">{userProgress.nickname}</h3>
-            <p className="text-muted-foreground">Level {userProgress.level}</p>
+            <h3 className="text-2xl font-bold">Level {userProgress.level} Speaker</h3>
+            <p className="text-muted-foreground">
+              {userProgress.gradeLevel} - {userProgress.experienceLevel}
+            </p>
           </div>
         </div>
         <div className="space-y-2">
@@ -77,6 +80,12 @@ export function UserProfile() {
               <p className="text-muted-foreground text-sm">No badges yet. Keep learning!</p>
             )}
           </div>
+        </div>
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <Flame
+            className={cn("h-5 w-5", userProgress.weeklyStreak > 0 ? "text-orange-500" : "text-muted-foreground")}
+          />
+          <span>Weekly Streak: {userProgress.weeklyStreak} days</span>
         </div>
       </CardContent>
     </Card>

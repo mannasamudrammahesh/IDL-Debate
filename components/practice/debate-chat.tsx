@@ -10,9 +10,12 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { mockAiFeedback, mockDebateMessages } from "@/lib/data"
 import { AiFeedbackPanel } from "@/components/ui/ai-feedback-panel"
 import type { DebateMessage, AiFeedback } from "@/lib/types"
-import { Timer, RefreshCcw, MessageCircleQuestion } from "lucide-react"
+import { Timer, RefreshCcw, MessageCircleQuestion, Mic, Pause, Play, Square } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { useUserProgress } from "@/hooks/use-user-progress"
+import { cn } from "@/utils/cn"
 
 interface DebateChatProps {
   userRole: string
@@ -28,9 +31,12 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
   const [showFeedback, setShowFeedback] = useState(false)
   const [aiFeedback, setAiFeedback] = useState<AiFeedback | null>(null)
   const [poiEnabled, setPoiEnabled] = useState(false)
+  const [speechNotes, setSpeechNotes] = useState("")
+  const [debateEnded, setDebateEnded] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const { updateProgress } = useUserProgress()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -92,6 +98,7 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
     }
     setMessages((prev) => [...prev, newUserMessage])
     setInput("")
+    setShowFeedback(false) // Hide previous feedback
 
     // Simulate AI response and feedback
     // In a real app, this would call an OpenAI API route
@@ -139,6 +146,7 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
       ])
     } else {
       setIsRunning(false)
+      setDebateEnded(true)
       setMessages((prev) => [
         ...prev,
         { id: "debate-end", role: "ai", content: "Debate concluded! Analyzing performance...", timestamp: new Date() },
@@ -146,6 +154,18 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
       // Final AI feedback or score
       setAiFeedback(mockAiFeedback) // Use mock feedback for demo
       setShowFeedback(true)
+      updateProgress((prev) => ({
+        ...prev,
+        debatesSimulated: (prev?.debatesSimulated || 0) + 1,
+        fallaciesDetected:
+          (prev?.fallaciesDetected || 0) +
+          (mockAiFeedback.fallaciesDetected.length > 0 &&
+          mockAiFeedback.fallaciesDetected[0] !== "No Fallacies Detected"
+            ? mockAiFeedback.fallaciesDetected.length
+            : 0),
+        xp: (prev?.xp || 0) + 100, // Example XP for completing a debate
+        level: Math.floor(((prev?.xp || 0) + 100) / 200) + 1,
+      }))
     }
   }
 
@@ -161,16 +181,31 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-150px)]">
-      <Card className="lg:col-span-2 flex flex-col">
+      <Card className="lg:col-span-2 flex flex-col animate-fadeIn">
         <CardHeader className="flex flex-row items-center justify-between border-b p-4">
           <CardTitle className="text-xl">Debate Arena: {debateMotion}</CardTitle>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1 text-lg font-semibold">
               <Timer className="h-5 w-5" /> {formatTime(timer)}
             </div>
-            <Button variant="outline" size="sm" onClick={handleRoleSwitch} title="Switch Role">
-              <RefreshCcw className="h-4 w-4" />
-              <span className="sr-only">Switch Role</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsRunning(!isRunning)}
+              title={isRunning ? "Pause Timer" : "Start Timer"}
+            >
+              {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              <span className="sr-only">{isRunning ? "Pause Timer" : "Start Timer"}</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRoundEnd}
+              disabled={debateEnded}
+              title="End Round/Debate"
+            >
+              <Square className="h-4 w-4" />
+              <span className="sr-only">End Round/Debate</span>
             </Button>
           </div>
         </CardHeader>
@@ -180,11 +215,12 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-[70%] p-3 rounded-lg ${
+                    className={cn(
+                      "max-w-[70%] p-3 rounded-lg animate-slideInFromBottom",
                       msg.role === "user"
                         ? "bg-purple-600 text-white"
-                        : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                    }`}
+                        : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+                    )}
                   >
                     <p className="font-semibold text-xs mb-1">{msg.role === "user" ? "You" : "AI Opponent"}</p>
                     <p>{msg.content}</p>
@@ -203,9 +239,9 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className="flex-grow"
-              disabled={!isRunning}
+              disabled={!isRunning || debateEnded}
             />
-            <Button type="submit" disabled={!isRunning}>
+            <Button type="submit" disabled={!isRunning || debateEnded}>
               Send
             </Button>
           </form>
@@ -213,7 +249,7 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
       </Card>
 
       <div className="lg:col-span-1 flex flex-col gap-6">
-        <Card>
+        <Card className="animate-fadeIn animation-delay-100">
           <CardHeader>
             <CardTitle>Debate Info</CardTitle>
           </CardHeader>
@@ -231,8 +267,33 @@ export function DebateChat({ userRole, debateMotion }: DebateChatProps) {
               <Label htmlFor="poi-mode" className="flex items-center gap-2">
                 <MessageCircleQuestion className="h-5 w-5" /> Point of Information (POI)
               </Label>
-              <Switch id="poi-mode" checked={poiEnabled} onCheckedChange={handlePoiToggle} />
+              <Switch id="poi-mode" checked={poiEnabled} onCheckedChange={handlePoiToggle} disabled={debateEnded} />
             </div>
+            <Button
+              variant="outline"
+              className="w-full mt-4 bg-transparent"
+              onClick={handleRoleSwitch}
+              disabled={debateEnded}
+            >
+              <RefreshCcw className="h-4 w-4 mr-2" /> Switch Role (Mock)
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="flex-grow animate-fadeIn animation-delay-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mic className="h-6 w-6 text-blue-500" /> Speech Notes
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="h-[calc(100%-80px)]">
+            <Textarea
+              placeholder="Jot down your key points, rebuttals, or evidence here..."
+              className="w-full h-full min-h-[150px] resize-none"
+              value={speechNotes}
+              onChange={(e) => setSpeechNotes(e.target.value)}
+              disabled={debateEnded}
+            />
           </CardContent>
         </Card>
 

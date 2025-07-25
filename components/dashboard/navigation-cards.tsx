@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen, Swords, Trophy, Settings } from "lucide-react"
+import { BookOpen, Swords, Trophy, Settings, FileText } from "lucide-react"
 
 export function NavigationCards() {
   const navItems = [
@@ -23,6 +23,12 @@ export function NavigationCards() {
       href: "/achievements",
     },
     {
+      title: "Feedback Reports",
+      description: "Review detailed AI feedback from past sessions.",
+      icon: FileText,
+      href: "/feedback-reports",
+    },
+    {
       title: "Settings",
       description: "Manage your profile and preferences.",
       icon: Settings,
@@ -31,10 +37,13 @@ export function NavigationCards() {
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {navItems.map((item, index) => (
         <Link key={index} href={item.href}>
-          <Card className="h-full flex flex-col justify-between hover:shadow-lg transition-shadow duration-200">
+          <Card
+            className="h-full flex flex-col justify-between hover:shadow-lg transition-shadow duration-200 animate-slideInFromBottom"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-lg font-medium">{item.title}</CardTitle>
               <item.icon className="h-6 w-6 text-muted-foreground" />

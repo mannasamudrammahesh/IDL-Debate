@@ -4,7 +4,7 @@ import { TestimonialsSection } from "@/components/landing/testimonials"
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-[calc(100svh-65px)]">
+    <div className="flex flex-col">
       <HeroSection />
       <HowItWorksSection />
       <TestimonialsSection />

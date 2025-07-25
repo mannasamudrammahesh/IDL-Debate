@@ -1,195 +1,189 @@
-import type { UserProgress, Lesson, Testimonial, AiFeedback, DebateMessage } from "./types"
+import type { Lesson, UserProgress, DebateMessage, AiFeedback, Testimonial, DebateSession, Challenge } from "./types"
 
 export const mockUserProgress: UserProgress = {
-  avatar: "/placeholder.svg?height=100&width=100",
+  id: "user-123",
   nickname: "DebateMaster",
-  xp: 1250,
-  level: 7,
-  badges: ["Fallacy Finder", "Argument Architect"],
-  modulesCompleted: 5,
-  debatesSimulated: 12,
-  fallaciesDetected: 3,
+  avatar: "/placeholder-user.jpg",
   gradeLevel: "high-school",
   experienceLevel: "intermediate",
-  accuracy: 85,
-  responseTime: 1200, // ms
-  debateScore: 7.8,
+  xp: 150,
+  level: 1,
+  badges: ["Argument Architect"],
+  modulesCompleted: 2,
+  debatesSimulated: 5,
+  fallaciesDetected: 10,
+  lastLessonId: "lesson-2",
+  lastLessonProgress: 75,
+  weeklyStreak: 3,
+  lastLoginDate: "2025-07-19",
 }
 
 export const mockLessons: Lesson[] = [
   {
-    id: "1",
-    title: "Debate Basics",
-    description: "Understand the fundamental concepts of debate.",
+    id: "lesson-1",
+    title: "Debate Basics: Structure & Flow",
+    description: "Understand the fundamental structure of a debate round.",
     level: 1,
-    progress: 100,
+    xpReward: 100,
     completed: true,
+    progress: 100,
     content: `
-## Introduction to Debate
+## Introduction to Debate Structure
 
-Debate is a structured discussion where two opposing sides present arguments for and against a specific proposition or motion. The goal is to persuade an audience or a judge that your side's arguments are more valid and well-supported.
+Debate is a structured argument, and understanding its framework is crucial. Most debates follow a clear sequence of speeches, ensuring fairness and logical progression.
 
-### Key Elements of Debate:
+### The Core Components
 
-1.  **Motion**: The topic or statement being debated. It's usually phrased as a resolution, e.g., "This House believes that social media is harmful."
-2.  **Affirmative (Proposition) Side**: Argues in favor of the motion.
-3.  **Negative (Opposition) Side**: Argues against the motion.
-4.  **Arguments**: Reasons or points presented to support a side's position. Arguments should be logical, evidence-based, and clearly articulated.
-5.  **Rebuttal**: The act of refuting or counter-arguing the points made by the opposing side. This is crucial for demonstrating the weaknesses in their case.
-6.  **Structure**: Debates typically follow a specific structure with opening statements, rebuttals, and closing summaries.
+1.  **Motion**: The topic being debated, usually phrased as a statement (e.g., "This House would ban single-use plastics").
+2.  **Teams**: Typically two teams, one affirming (supporting) the motion and one negating (opposing) it.
+3.  **Speakers**: Each team has a set number of speakers, each with specific roles.
 
-### Why Debate?
+### Standard Debate Flow (Simplified)
 
-Debate helps develop critical thinking, public speaking, research, and analytical skills. It teaches you to construct logical arguments, listen actively, and respond persuasively under pressure.
-`,
+A common format, like British Parliamentary or Public Forum, involves several rounds:
+
+*   **Opening Statements**: Each side presents their initial case and arguments. This is where you lay out your main points.
+*   **Rebuttals**: Speakers respond to the arguments made by the opposing team, refuting their points and defending their own. This is the heart of the debate.
+*   **Summaries/Closings**: Final speeches where teams summarize their key arguments and explain why they should win the debate. No new arguments are allowed here.
+
+### Points of Information (POIs)
+
+During an opponent's speech, you might be able to offer a "Point of Information." This is a brief question or statement to challenge their argument. The speaker can choose to accept or reject the POI.
+
+Understanding these phases helps you know when to present your case, when to attack, and when to summarize.
+    `,
     diagramUrl: "/placeholder.svg?height=300&width=500",
     quiz: {
       id: "quiz-1",
       questions: [
         {
-          id: "q1",
+          id: "q1-1",
+          question: "What is the purpose of an opening statement in a debate?",
           type: "mcq",
-          question: "What is the primary goal of a debate?",
-          options: ["To win an argument", "To persuade an audience", "To share information", "To entertain"],
-          correctAnswer: "To persuade an audience",
-          feedback: "Correct! The core of debate is persuasion.",
+          options: [
+            "To summarize the entire debate",
+            "To present initial arguments and case",
+            "To refute opponent's points",
+            "To ask a Point of Information",
+          ],
+          correctAnswer: "To present initial arguments and case",
+          feedback: "Correct! Opening statements are for laying out your initial case.",
         },
         {
-          id: "q2",
+          id: "q1-2",
+          question: "True or False: New arguments are typically allowed during the summary phase.",
           type: "true-false",
-          question: "The Affirmative side argues against the motion.",
           correctAnswer: "False",
-          feedback: "Incorrect. The Affirmative side argues *for* the motion.",
+          feedback: "False. The summary phase is for concluding, not introducing new points.",
         },
       ],
     },
   },
   {
-    id: "2",
-    title: "Roles in Debate",
-    description: "Learn the responsibilities of each speaker.",
-    level: 2,
-    progress: 50,
+    id: "lesson-2",
+    title: "Roles in Debate: Speaker Responsibilities",
+    description: "Learn the specific duties of each speaker in a debate.",
+    level: 1,
+    xpReward: 100,
     completed: false,
+    progress: 75,
     content: `
-## Understanding Debate Roles
+## Understanding Speaker Roles
 
-In most debate formats, each speaker has a specific role and set of responsibilities. Understanding these roles is crucial for a successful debate.
+In a structured debate, each speaker has a defined role and set of responsibilities. Knowing your role, and your opponent's, is key to success.
 
-### Common Roles:
+### Common Roles (Example: British Parliamentary Style)
 
-1.  **Prime Minister (PM) / First Affirmative**:
-    *   Defines the motion.
-    *   Presents the affirmative team's case and main arguments.
-    *   Sets the framework for the debate.
+*   **Prime Minister (PM)**: Opens the debate for the Affirmative team. Defines the motion, presents the team's case, and introduces initial arguments.
+*   **Leader of Opposition (LO)**: Opens for the Negative team. Responds to the PM's case, presents the opposition's counter-arguments, and outlines their team's stance.
+*   **Deputy Prime Minister (DPM)**: Second speaker for the Affirmative. Rebuts the LO's arguments, reinforces the Affirmative's case, and introduces new arguments (if allowed by format).
+*   **Deputy Leader of Opposition (DLO)**: Second speaker for the Negative. Rebuts the DPM's arguments, reinforces the Negative's case, and introduces new arguments (if allowed).
+*   **Government Whip / Opposition Whip**: Later speakers who summarize their team's case, highlight key clashes, and often provide a final rebuttal.
+*   **Leader of Opposition Reply / Prime Minister Reply**: Final speakers who give a concise summary of the entire debate from their side's perspective, emphasizing why their team won.
 
-2.  **Leader of Opposition (LO) / First Negative**:
-    *   Challenges the PM's definition (if necessary).
-    *   Rebuts the PM's arguments.
-    *   Presents the opposition team's case and main arguments.
+### Key Responsibilities Across Roles
 
-3.  **Deputy Prime Minister (DPM) / Second Affirmative**:
-    *   Rebuts the LO's arguments.
-    *   Rebuilds the affirmative case.
-    *   Introduces new arguments (if allowed by format).
+*   **Construction**: Building and presenting your team's arguments.
+*   **Rebuttal**: Directly addressing and dismantling opponent's arguments.
+*   **Extension**: Introducing new arguments or deepening existing ones (depending on the role and format).
+*   **Summarization**: Concluding your team's case and highlighting key victories.
 
-4.  **Deputy Leader of Opposition (DLO) / Second Negative**:
-    *   Rebuts the DPM's arguments.
-    *   Rebuilds the opposition case.
-    *   Introduces new arguments (if allowed by format).
-
-5.  **Government Whip / Third Affirmative**:
-    *   Summarizes the affirmative case.
-    *   Rebuts key opposition arguments.
-    *   No new arguments.
-
-6.  **Opposition Whip / Third Negative**:
-    *   Summarizes the opposition case.
-    *   Rebuts key affirmative arguments.
-    *   No new arguments.
-
-7.  **Reply Speaker (often PM or LO)**:
-    *   Provides a biased summary of the entire debate.
-    *   Highlights key clashes and why their side won.
-    *   No new arguments.
-`,
+Mastering your role ensures your team's arguments are presented effectively and strategically.
+    `,
+    diagramUrl: "/placeholder.svg?height=300&width=500",
     quiz: {
       id: "quiz-2",
       questions: [
         {
-          id: "q1",
+          id: "q2-1",
+          question:
+            "Which speaker typically defines the motion and presents the initial arguments for the Affirmative team?",
           type: "mcq",
-          question: "Which role is responsible for defining the motion?",
-          options: ["Leader of Opposition", "Deputy Prime Minister", "Prime Minister", "Reply Speaker"],
+          options: ["Leader of Opposition", "Deputy Prime Minister", "Prime Minister", "Government Whip"],
           correctAnswer: "Prime Minister",
-          feedback: "Correct! The Prime Minister sets the stage.",
+          feedback: "Correct! The Prime Minister sets the stage for the Affirmative.",
         },
         {
-          id: "q2",
+          id: "q2-2",
+          question: "True or False: Rebuttal is the act of summarizing your own arguments.",
           type: "true-false",
-          question: "The Reply Speaker can introduce new arguments.",
           correctAnswer: "False",
-          feedback: "Incorrect. Reply Speakers summarize, they do not introduce new arguments.",
+          feedback: "False. Rebuttal is about refuting your opponent's arguments.",
         },
       ],
     },
   },
   {
-    id: "3",
-    title: "Logical Fallacies",
-    description: "Identify and avoid common errors in reasoning.",
-    level: 3,
-    progress: 0,
+    id: "lesson-3",
+    title: "Logical Fallacies: Spotting Weak Arguments",
+    description: "Identify common errors in reasoning to strengthen your arguments and weaken opponents'.",
+    level: 2,
+    xpReward: 150,
     completed: false,
+    progress: 0,
     content: `
-## Logical Fallacies: Errors in Reasoning
+## Introduction to Logical Fallacies
 
-A logical fallacy is an error in reasoning that makes an argument invalid or weak. Identifying and avoiding fallacies is crucial for constructing strong, persuasive arguments and for effectively rebutting your opponents.
+A logical fallacy is an error in reasoning that makes an argument invalid or weak. Learning to identify them is crucial for both constructing strong arguments and deconstructing weak ones.
 
-### Common Logical Fallacies:
+### Common Logical Fallacies
 
-1.  **Ad Hominem**: Attacking the person making the argument instead of the argument itself.
-    *   *Example*: "You can't trust anything she says about climate change; she's just a teenager."
-
+1.  **Ad Hominem**: Attacking the person making the argument, rather than the argument itself.
+    *   *Example*: "You can't trust anything she says about climate change; she failed her science class!"
 2.  **Straw Man**: Misrepresenting an opponent's argument to make it easier to attack.
-    *   *Example*: "My opponent wants to ban all cars, which would destroy the economy. That's ridiculous!" (Opponent actually proposed promoting public transport).
+    *   *Example*: "My opponent wants to cut military spending, which means he wants to leave our country defenseless." (Opponent might want to reallocate funds, not eliminate defense).
+3.  **Bandwagon Fallacy (Ad Populum)**: Assuming something is true or good because many people believe it or do it.
+    *   *Example*: "Everyone is buying this new smartphone, so it must be the best one on the market."
+4.  **Slippery Slope**: Asserting that a relatively small first step will inevitably lead to a chain of related, increasingly negative events.
+    *   *Example*: "If we allow students to use phones in class, soon they'll be watching movies, then skipping class, and eventually dropping out of school!"
+5.  **False Dilemma (Black or White)**: Presenting only two options or sides when there are actually more.
+    *   *Example*: "Either you support the new policy, or you're against progress."
 
-3.  **Slippery Slope**: Asserting that a relatively small first step will inevitably lead to a chain of related, increasingly negative events.
-    *   *Example*: "If we allow students to use phones in class, soon they'll be watching movies, then skipping class, and eventually dropping out of school."
+### Why They Matter in Debate
 
-4.  **False Dilemma (Black or White)**: Presenting only two options or sides when there are actually more.
-    *   *Example*: "Either you support the new policy, or you support chaos."
+*   **For Your Own Arguments**: Avoiding fallacies makes your arguments more robust and persuasive.
+*   **For Opponent's Arguments**: Identifying fallacies in your opponent's speech allows you to expose weaknesses and undermine their case.
 
-5.  **Appeal to Authority**: Claiming something is true because an authority figure said it, without sufficient evidence or when the authority is not an expert in that specific field.
-    *   *Example*: "My doctor said this diet is the best, so it must be true." (Doctor is not a nutritionist).
-
-6.  **Bandwagon (Ad Populum)**: Claiming something is true because many people believe it.
-    *   *Example*: "Everyone is buying this new smartphone, so it must be the best."
-
-### Why Learn Fallacies?
-
-Understanding fallacies helps you:
-*   Strengthen your own arguments by ensuring they are logically sound.
-*   Critically evaluate the arguments of others.
-*   Effectively rebut opponents by pointing out flaws in their reasoning.
-`,
+Practice spotting these in everyday conversations and media to hone your critical thinking skills!
+    `,
+    diagramUrl: "/placeholder.svg?height=300&width=500",
     quiz: {
       id: "quiz-3",
       questions: [
         {
-          id: "q1",
+          id: "q3-1",
+          question: "Which fallacy involves attacking the person rather than their argument?",
           type: "mcq",
-          question: "Which fallacy involves attacking the person instead of the argument?",
-          options: ["Straw Man", "Slippery Slope", "Ad Hominem", "False Dilemma"],
+          options: ["Straw Man", "Slippery Slope", "Ad Hominem", "Bandwagon"],
           correctAnswer: "Ad Hominem",
-          feedback: "Correct! Ad Hominem attacks the individual, not the idea.",
+          feedback: "Correct! Ad Hominem attacks the individual, not the logic.",
         },
         {
-          id: "q2",
+          id: "q3-2",
+          question: "True or False: The Straw Man fallacy misrepresents an opponent's argument.",
           type: "true-false",
-          question: "A Straw Man fallacy accurately represents an opponent's argument.",
-          correctAnswer: "False",
-          feedback: "Incorrect. A Straw Man distorts the opponent's argument.",
+          correctAnswer: "True",
+          feedback: "True. It's about creating a 'straw man' version of their argument to easily knock down.",
         },
       ],
     },
@@ -198,59 +192,150 @@ Understanding fallacies helps you:
 
 export const mockTestimonials: Testimonial[] = [
   {
-    quote: "DebateQuest transformed my public speaking skills! The AI feedback is incredibly insightful.",
+    quote:
+      "DebateQuest made learning debate so much fun! The gamified modules kept me engaged, and the AI feedback was incredibly helpful for improving my arguments.",
     author: "Sarah L.",
     role: "High School Student",
   },
   {
-    quote: "The gamified modules made learning debate fun and engaging. I actually look forward to practicing!",
-    author: "David K.",
+    quote:
+      "As a beginner, I was intimidated by debate. DebateQuest broke it down into easy steps, and the practice arena felt just like a real debate, but with instant coaching!",
+    author: "David C.",
     role: "Middle School Student",
   },
   {
-    quote: "As a college student, DebateQuest helped me refine my arguments and detect fallacies like a pro.",
+    quote:
+      "The logical fallacies module was a game-changer. I can now spot weak arguments instantly, which has boosted my confidence in every debate.",
     author: "Emily R.",
-    role: "College Student",
+    role: "College Debate Club Member",
+  },
+]
+
+export const mockDebateMessages: DebateMessage[] = [
+  {
+    id: "msg-1",
+    role: "ai",
+    content:
+      "Welcome to the debate! The motion is: 'Should school uniforms be mandatory?'. You are the Prime Minister. Please present your opening statement.",
+    timestamp: new Date(Date.now() - 60000),
+  },
+  {
+    id: "msg-2",
+    role: "user",
+    content:
+      "I believe school uniforms should be mandatory because they reduce distractions and promote a more focused learning environment. When students don't have to worry about fashion, they can concentrate on academics.",
+    timestamp: new Date(Date.now() - 30000),
+  },
+  {
+    id: "msg-3",
+    role: "ai",
+    content:
+      "Thank you for your opening statement. While reducing distractions is a valid point, mandatory uniforms can stifle student individuality and self-expression, which are crucial for personal development. Furthermore, the financial burden on low-income families can be significant.",
+    timestamp: new Date(),
   },
 ]
 
 export const mockAiFeedback: AiFeedback = {
-  fallaciesDetected: ["Ad Hominem", "Straw Man"],
+  argumentStrength: 7.5,
+  coherenceScore: 8.2,
+  fallaciesDetected: ["No Fallacies Detected"],
   suggestions: [
-    "Focus on the policy implications rather than personal attacks.",
-    "Ensure your rebuttal directly addresses the opponent's actual argument, not a distorted version.",
-    "Provide more specific evidence to support your claims.",
+    "Provide specific examples of how fashion choices distract students.",
+    "Quantify the impact of uniforms on academic focus.",
+    "Consider addressing potential counter-arguments proactively.",
   ],
-  coherenceScore: 6.5,
+  rhetoricalTone: "persuasive",
 }
 
-export const mockDebateMessages: DebateMessage[] = [
+export const mockDebateSessions: DebateSession[] = [
   {
-    id: "1",
-    role: "ai",
-    content:
-      'Welcome to the debate! The motion is: "This House believes that social media is harmful." You are the Prime Minister. Please present your opening statement.',
-    timestamp: new Date(),
+    id: "session-1",
+    motion: "Should school uniforms be mandatory?",
+    userRole: "Prime Minister",
+    date: "2025-07-18",
+    duration: 300,
+    messages: mockDebateMessages,
+    finalFeedback: {
+      argumentStrength: 7.5,
+      coherenceScore: 8.2,
+      fallaciesDetected: ["No Fallacies Detected"],
+      suggestions: [
+        "Provide specific examples of how fashion choices distract students.",
+        "Quantify the impact of uniforms on academic focus.",
+        "Consider addressing potential counter-arguments proactively.",
+      ],
+      rhetoricalTone: "persuasive",
+    },
+    score: 75,
   },
   {
-    id: "2",
-    role: "user",
-    content:
-      "Social media leads to increased anxiety and depression among young people, as studies show a correlation between heavy usage and mental health decline.",
-    timestamp: new Date(),
+    id: "session-2",
+    motion: "Is artificial intelligence a threat to humanity?",
+    userRole: "Opposition Leader",
+    date: "2025-07-17",
+    duration: 280,
+    messages: [], // Simplified for mock
+    finalFeedback: {
+      argumentStrength: 6.0,
+      coherenceScore: 7.0,
+      fallaciesDetected: ["Ad Hominem (minor)"],
+      suggestions: ["Focus on the argument, not the AI's 'lack of empathy'."],
+      retary: "neutral",
+    },
+    score: 60,
   },
   {
-    id: "3",
-    role: "ai",
-    content:
-      "While mental health is a concern, social media also provides vital platforms for connection, activism, and education. Many studies also highlight its positive impact on community building and information dissemination. How do you reconcile your claim with these benefits?",
-    timestamp: new Date(),
+    id: "session-3",
+    motion: "Should social media companies be held responsible for misinformation?",
+    userRole: "Prime Minister",
+    date: "2025-07-16",
+    duration: 320,
+    messages: [], // Simplified for mock
+    finalFeedback: {
+      argumentStrength: 8.5,
+      coherenceScore: 9.0,
+      fallaciesDetected: ["No Fallacies Detected"],
+      suggestions: ["Excellent use of evidence and clear structure."],
+      rhetoricalTone: "formal",
+    },
+    score: 90,
+  },
+]
+
+export const mockChallenges: Challenge[] = [
+  {
+    id: "daily-1",
+    name: "Daily Quiz Master",
+    description: "Complete any lesson quiz with 100% accuracy.",
+    xpReward: 50,
+    badgeReward: "Quiz Whiz",
+    completed: false,
+    type: "daily",
   },
   {
-    id: "4",
-    role: "user",
-    content:
-      "The negative impacts outweigh the benefits. The curated, often unrealistic, portrayals of life on social media create immense pressure and foster comparison, leading to feelings of inadequacy.",
-    timestamp: new Date(),
+    id: "daily-2",
+    name: "Daily Debate Practice",
+    description: "Complete one full debate simulation in the Practice Arena.",
+    xpReward: 75,
+    completed: true,
+    type: "daily",
+  },
+  {
+    id: "weekly-1",
+    name: "Weekly Fallacy Finder",
+    description: "Identify 5 logical fallacies in AI feedback across multiple debates.",
+    xpReward: 200,
+    badgeReward: "Fallacy Finder",
+    completed: false,
+    type: "weekly",
+  },
+  {
+    id: "weekly-2",
+    name: "Weekly Argument Architect",
+    description: "Achieve an average argument strength of 8.0+ in 3 debate sessions.",
+    xpReward: 250,
+    badgeReward: "Argument Architect",
+    completed: true,
+    type: "weekly",
   },
 ]
